@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل العروض الذكي</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #0f172a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { color: var(--primary); font-size: 1.8rem; }
+        .filters { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 0.85rem; font-weight: bold; }
+        select, input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+        .badge { position: absolute; top: 15px; left: 15px; background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+        .price { font-size: 1.3rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
+        .btn { display: block; text-align: center; background: var(--primary); color: white; text-decoration: none; padding: 10px; border-radius: 6px; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🎯 دليل الصفقات الذكي</h1>
+        <p>اختر دولتك وميزانيتك للعثور على أفضل صفقة فعلياً</p>
+    </header>
+
+    <div class="filters">
+        <div class="group">
+            <label>الدولة</label>
+            <select id="country" onchange="render()">
+                <option value="MA">المغرب 🇲🇦</option>
+                <option value="EG">مصر 🇪🇬</option>
+            </select>
+        </div>
+        <div class="group">
+            <label>الفئة</label>
+            <select id="category" onchange="render()">
+                <option value="phones">هواتف ذكية</option>
+            </select>
+        </div>
+        <div class="group">
+            <label>أقصى ميزانية (بالعملة المحلية)</label>
+            <input type="number" id="budget" value="2000" oninput="render()">
+        </div>
+    </div>
+
+    <div id="results" class="grid"></div>
+</div>
+
+<script>
+let data = [];
+async function init() {
+    try {
+        const res = await fetch('products.json');
+        data = await res.json();
+        render();
+    } catch (e) {
+        document.getElementById('results').innerHTML = '<p>تعذر تحميل البيانات.</p>';
+    }
+}
+
+function render() {
+    const country = document.getElementById('country').value;
+    const category = document.getElementById('category').value;
+    const budget = parseFloat(document.getElementById('budget').value) || 0;
+    const container = document.getElementById('results');
+    container.innerHTML = '';
+
+    const list = data.filter(p => p.country === country && p.category === category && p.price_local <= budget)
+                    .sort((a,b) => b.seller_trust - a.seller_trust);
+
+    if (!list.length) {
+        container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">لا توجد عروض تناسب هذه الميزانية حالياً.</p>';
+        return;
+    }
+
+    list.forEach(p => {
+        container.innerHTML += `
+            <div class="card">
+                <span class="badge">ثقة: ${p.seller_trust}%</span>
+                <h3>${p.title}</h3>
+                <div class="price">${p.price_local} ${p.currency} (~ $${p.price_usd})</div>
+                <p><small>المنصة: ${p.platform} (${p.condition})</small></p>
+                <a href="${p.url}" target="_blank" class="btn">الانتقال للعرض 🔗</a>
+            </div>
+        `;
+    });
+}
+init();
+</script>
+</body>
+</html>
