@@ -1,0 +1,28 @@
+[
+  {
+    "id": "ph-001",
+    "title": "Samsung Galaxy A15 (128GB)",
+    "category": "phones",
+    "country": "MA",
+    "currency": "MAD",
+    "price_local": 1450,
+    "price_usd": 145,
+    "condition": "جديد",
+    "platform": "Jumia",
+    "seller_trust": 90,
+    "url": "https://www.jumia.ma"
+  },
+  {
+    "id": "ph-002",
+    "title": "Redmi Note 13 (256GB)",
+    "category": "phones",
+    "country": "EG",
+    "currency": "EGP",
+    "price_local": 8200,
+    "price_usd": 172,
+    "condition": "جديد",
+    "platform": "Amazon",
+    "seller_trust": 95,
+    "url": "https://www.amazon.eg"
+  }
+]
